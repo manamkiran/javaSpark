@@ -13,11 +13,11 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		List<Double> inputData = new ArrayList<>();
-		inputData.add(12.0);
-		inputData.add(13.0);
-		inputData.add(11.12);
-		inputData.add(1.02);
+		List<Integer> inputData = new ArrayList<>();
+		inputData.add(12);
+		inputData.add(13);
+		inputData.add(45);
+		inputData.add(102);
 
 		Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -25,9 +25,14 @@ public class Main {
 
 		try (JavaSparkContext sc = new JavaSparkContext(conf);) {
 
-			JavaRDD<Double> myRDD = sc.parallelize(inputData);
+			JavaRDD<Integer> myRDD = sc.parallelize(inputData);
 
-			Double result = myRDD.reduce((value1, value2) -> value1 + value2);
+			Double result = myRDD.map(x -> Math.sqrt(x)).reduce(Double::sum);
+
+			JavaRDD<Double> squareRootRDD = myRDD.map(x -> Math.sqrt(x));
+
+			System.out.println();
+			System.out.println("ReducedRDD is : "+squareRootRDD.reduce(Double::sum));
 
 			System.out.println(result);
 		}
