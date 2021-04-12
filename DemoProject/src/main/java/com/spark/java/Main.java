@@ -1,14 +1,13 @@
 package com.spark.java;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
-
-import scala.Tuple2;
 
 public class Main {
 
@@ -27,10 +26,10 @@ public class Main {
 
 		try (JavaSparkContext sc = new JavaSparkContext(conf);) {
 
-			sc.parallelize(inputData)
-					.mapToPair(row -> new Tuple2<>(row.split(":")[0], 1L))
-					.reduceByKey((value1, value2) -> value1 + value2)
-					.foreach(tup -> System.out.println(tup._1 + " : " + tup._2));
+			sc.parallelize(inputData).flatMap(value -> Arrays.asList(value.split(" ")).iterator())
+//					.foreach(System.out::println); //Not working
+					.foreach(word -> System.out.println(word));
+			;
 		}
 	}
 }
