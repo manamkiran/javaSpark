@@ -9,6 +9,8 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
+import scala.Tuple2;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -25,16 +27,10 @@ public class Main {
 
 		try (JavaSparkContext sc = new JavaSparkContext(conf);) {
 
-			JavaRDD<Integer> myRDD = sc.parallelize(inputData);
+			JavaRDD<Integer> originalRDD = sc.parallelize(inputData);
 
-			Double result = myRDD.map(x -> Math.sqrt(x)).reduce(Double::sum);
+			JavaRDD<Tuple2<Integer, Double>> squareRootRDD = originalRDD.map(x -> new Tuple2<>(x, Math.sqrt(x)));
 
-			JavaRDD<Double> squareRootRDD = myRDD.map(x -> Math.sqrt(x));
-
-			System.out.println();
-			System.out.println("ReducedRDD is : "+squareRootRDD.reduce(Double::sum));
-
-			System.out.println(result);
 		}
 	}
 }
