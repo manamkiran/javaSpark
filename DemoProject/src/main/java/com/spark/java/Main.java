@@ -19,7 +19,9 @@ public class Main {
 
 			Dataset<Row> dataset = spark.read().option("header", true).csv("src/main/resources/exams/students.csv");
 
-			dataset.filter("subject = 'Modern Art' AND year >= 2007").show();
+			dataset.filter(row -> "Modern Art".equals(row.getAs("subject"))).show();
+
+			// dataset.filter("subject = 'Modern Art' AND year >= 2007").show();
 
 			// dataset.count();
 
