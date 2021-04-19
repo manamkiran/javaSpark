@@ -1,13 +1,10 @@
 package com.spark.java;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-
-import scala.Tuple2;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 
 public class Main {
 
@@ -17,19 +14,34 @@ public class Main {
 
 		Logger.getLogger("org.apache").setLevel(Level.WARN);
 
-		SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
+		try (SparkSession spark = SparkSession.builder().appName("testingSQL").master("local[*]")
+				.config("spark.sql.warehouse.dir", "file:///D:/softwares/hadoop").getOrCreate()) {
 
-		try (JavaSparkContext sc = new JavaSparkContext(conf);) {
-			sc.textFile("src/main/resources/subtitles/input.txt")
-					.map(sentence -> sentence.toLowerCase().replaceAll("[^a-zA-Z\\s]", ""))
-					.filter(sentence -> sentence.trim().length() > 1)
-					.flatMap(sentence -> Arrays.asList(sentence.split(" ")).iterator())
-					.filter(word -> word.trim().length() > 1).filter(Util::isNotBoring)
-					.mapToPair(word -> new Tuple2<>(word, 1))
-					.reduceByKey((value1, value2) -> value1 + value2)
-					.mapToPair(tuple -> new Tuple2<>(tuple._2, tuple._1)).sortByKey(false).take(10)
-					.forEach(countTuple -> System.out.println(countTuple._2 +" word has occured " + countTuple._1));
-			;
+			Dataset<Row> dataset = spark.read().option("header", true).csv("src/main/resources/exams/students.csv");
+
+			dataset.filter("subject = 'Modern Art' AND year >= 2007").show();
+
+			// dataset.count();
+
 		}
+
+		/*
+		 * SparkConf conf = new
+		 * SparkConf().setAppName("startingSpark").setMaster("local[*]");
+		 * 
+		 * try (JavaSparkContext sc = new JavaSparkContext(conf);) {
+		 * 
+		 * 
+		 * 
+		 * sc.textFile("src/main/resources/subtitles/input.txt") .map(sentence ->
+		 * sentence.toLowerCase().replaceAll("[^a-zA-Z\\s]", "")) .filter(sentence ->
+		 * sentence.trim().length() > 1) .flatMap(sentence ->
+		 * Arrays.asList(sentence.split(" ")).iterator()) .filter(word ->
+		 * word.trim().length() > 1).filter(Util::isNotBoring) .mapToPair(word -> new
+		 * Tuple2<>(word, 1)) .reduceByKey((value1, value2) -> value1 + value2)
+		 * .mapToPair(tuple -> new Tuple2<>(tuple._2,
+		 * tuple._1)).sortByKey(false).take(10) .forEach(countTuple ->
+		 * System.out.println(countTuple._2 +" word has occured " + countTuple._1)); }
+		 */
 	}
 }
