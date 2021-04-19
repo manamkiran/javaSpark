@@ -2,7 +2,6 @@ package com.spark.java;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.apache.log4j.Level;
@@ -20,7 +19,7 @@ import scala.Tuple2;
 public class ViewingFigures {
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-		System.setProperty("hadoop.home.dir", "c:/hadoop");
+		System.setProperty("hadoop.home.dir", "D:\\softwares\\hadoop");
 		Logger.getLogger("org.apache").setLevel(Level.WARN);
 
 		SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
