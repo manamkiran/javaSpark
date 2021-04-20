@@ -42,10 +42,14 @@ public class Main {
 
 			StructType schema = new StructType(fields);
 			Dataset<Row> dataset = spark.createDataFrame(inMemory, schema);
-			
+
 			dataset.createOrReplaceTempView("loggingTable");
-			
-			spark.sql("select level,count(datetime) from loggingTable group by level").show();
+
+			Dataset<Row> result = spark.sql("select level,date_format(datetime,'MMMM') as month from loggingTable");
+
+			result.createOrReplaceTempView("loggingTable");
+
+			spark.sql("select level,month,count(1) as total from loggingTable group by level,month").show();
 
 //			dataset.show();
 		}
