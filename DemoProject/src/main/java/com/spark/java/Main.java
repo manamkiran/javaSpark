@@ -1,8 +1,9 @@
 package com.spark.java;
 
+import static org.apache.spark.sql.functions.col;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -20,10 +21,7 @@ public class Main {
 
 			Dataset<Row> dataset = spark.read().option("header", true).csv("src/main/resources/exams/students.csv");
 
-			Column subject = dataset.col("subject");
-			Column year = dataset.col("year");
-
-			dataset.filter(subject.equalTo("Modern Art").and(year.geq(2007))).show();
+			dataset.filter(col("subject").equalTo("Modern Art").and(col("year").geq(2007))).show();
 
 			// dataset.filter(row -> "Modern Art".equals(row.getAs("subject"))).show();
 
