@@ -42,8 +42,12 @@ public class Main {
 
 			StructType schema = new StructType(fields);
 			Dataset<Row> dataset = spark.createDataFrame(inMemory, schema);
+			
+			dataset.createOrReplaceTempView("loggingTable");
+			
+			spark.sql("select level,count(datetime) from loggingTable group by level").show();
 
-			dataset.show();
+//			dataset.show();
 		}
 
 		/*
