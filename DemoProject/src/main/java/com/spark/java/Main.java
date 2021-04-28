@@ -22,9 +22,10 @@ public class Main {
 			dataset.createOrReplaceTempView("loggingTable");
 
 			Dataset<Row> results = spark.sql(
-					"select level,date_format(datetime,'MMMM') as month,first(date_format(datetime,'MM')) as monthNum,count(*) as total from loggingTable group by level,month order by monthNum");
+					"select level,date_format(datetime,'MMMM') as month,count(*) as total from loggingTable group by level,month order by first(date_format(datetime,'MM')),level");
 
-			results.drop("monthNum").show(100);
+			// results.drop("monthNum").show(100);
+			results.show(100);
 //			dataset.show();
 			/*
 			 * List<Row> inMemory = new ArrayList<Row>();
