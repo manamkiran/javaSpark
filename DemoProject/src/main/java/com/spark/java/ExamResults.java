@@ -3,7 +3,7 @@ package com.spark.java;
 import static org.apache.spark.sql.functions.avg;
 import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.round;
-import static org.apache.spark.sql.functions.stddev;
+import static org.apache.spark.sql.functions.*;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -24,8 +24,13 @@ public class ExamResults {
 
 			Dataset<Row> dataset = spark.read().option("header", true).csv("src/main/resources/exams/students.csv");
 
-			dataset = dataset.groupBy("subject").pivot("year").agg(round(avg(col("score")), 2).alias("average"),
-					round(stddev(col("score")), 2).alias("stddev"));
+			/*
+			 * dataset =
+			 * dataset.groupBy("subject").pivot("year").agg(round(avg(col("score")),
+			 * 2).alias("average"), round(stddev(col("score")), 2).alias("stddev"));
+			 */
+
+			dataset = dataset.withColumn("pass", lit(col("grade").equalTo("A+")));
 
 			dataset.show();
 
