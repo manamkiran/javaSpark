@@ -22,8 +22,13 @@ public class ExamResults {
 				.config("spark.sql.warehouse.dir", "file:///D:/softwares/hadoop").getOrCreate()) {
 
 			Dataset<Row> dataset = spark.read().option("header", true).csv("src/main/resources/exams/students.csv");
-			
-			spark.udf().register("hasPassed", (String grade) -> grade.equals("A+"), DataTypes.BooleanType);
+
+			spark.udf().register("hasPassed", (String subject, String grade) -> {
+				if (subject.equals("Biology")) {
+					return grade.startsWith("A");
+				}
+				return grade.startsWith("A") || grade.startsWith("B") || grade.startsWith("C");
+			}, DataTypes.BooleanType);
 
 			/*
 			 * dataset =
@@ -31,10 +36,10 @@ public class ExamResults {
 			 * 2).alias("average"), round(stddev(col("score")), 2).alias("stddev"));
 			 */
 
-			//dataset = dataset.withColumn("pass", lit(col("grade").equalTo("A+")));
+			// dataset = dataset.withColumn("pass", lit(col("grade").equalTo("A+")));
 
-			dataset = dataset.withColumn("pass", callUDF("hasPassed", col("grade")));
-			
+			dataset = dataset.withColumn("pass", callUDF("hasPassed", col("subject"), col("grade")));
+
 			dataset.show();
 
 		}
