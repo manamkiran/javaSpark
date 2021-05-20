@@ -1,8 +1,6 @@
 package com.spark.java;
 
-import static org.apache.spark.sql.functions.avg;
 import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.round;
 import static org.apache.spark.sql.functions.*;
 
 import org.apache.log4j.Level;
@@ -10,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
 
 public class ExamResults {
 
@@ -23,6 +22,8 @@ public class ExamResults {
 				.config("spark.sql.warehouse.dir", "file:///D:/softwares/hadoop").getOrCreate()) {
 
 			Dataset<Row> dataset = spark.read().option("header", true).csv("src/main/resources/exams/students.csv");
+			
+			spark.udf().register("hasPassed", (String grade) -> grade.equals("A+"), DataTypes.BooleanType);
 
 			/*
 			 * dataset =
@@ -30,8 +31,10 @@ public class ExamResults {
 			 * 2).alias("average"), round(stddev(col("score")), 2).alias("stddev"));
 			 */
 
-			dataset = dataset.withColumn("pass", lit(col("grade").equalTo("A+")));
+			//dataset = dataset.withColumn("pass", lit(col("grade").equalTo("A+")));
 
+			dataset = dataset.withColumn("pass", callUDF("hasPassed", col("grade")));
+			
 			dataset.show();
 
 		}
